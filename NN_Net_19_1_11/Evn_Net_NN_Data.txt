@@ -1,0 +1,6 @@
+SL : max:1 min:0 avg:0.5
+SM : max:1 min:0 avg:0.5
+SR : max:1 min:0 avg:0.5
+Dis1 : max:299.0 min:0.0 avg:127.67984693877551
+Dis2 : max:297.0 min:0.0 avg:100.84566326530613
+Act : max:2.0 min:0.0 avg:0.9566326530612245
