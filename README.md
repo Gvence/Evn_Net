@@ -31,5 +31,15 @@ NN_Net_19_1_11: Net_Structure(6 - 20 - 50 - 20 - 5 )
         Output :S_L S_M S_R DIS1 DIS2
         Env is a statics state, but in this method of trainning it think of the enviroment
                 as some linear states
-        
+                
+RNN_Net_19_1_11: Net_Structure(6 - 512 - 5 )
+
+        record_ata.txt from map.py 
+        Input :S_L S_M S_R DIS1 DIS2 ACT
+        Output :S_L S_M S_R DIS1 DIS2
+        Rnn 具有时序性，尝试使用RNN
+        现实场景数据采集受限，在虚拟场景采数据
+        加入了数据归一化Batch Normalization
+        数据量十分庞大需要数据预处理，制作训练集，测试级，验证集用于后期网络性能验证（参考图像数据集制作）
+        需要增加网络模型保存方法
  
