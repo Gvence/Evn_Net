@@ -47,6 +47,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 	
         Input :S_L S_M S_R DIS1 DIS2 ACT
         Output :S_L S_M S_R DIS1 DIS2
+        Data_Processing.py用于数据集制作
         完成数据集制作train 0.7 test 0.15 val 0.15
         完成模型保存和重加载，网络可以进行间歇训练
         需要增加交叉验证方法
