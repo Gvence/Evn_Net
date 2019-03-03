@@ -52,4 +52,78 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         完成模型保存和重加载，网络可以进行间歇训练
         需要增加交叉验证方法
         了解网络中交叉熵加softmax的loss定义方法
- 
+
+ RNN_Net_19_2_28: Net_Structure(6 - 512 - 5)
+
+        Input :S_L S_M S_R DIS1 DIS2 ACT
+        Output :S_L S_M S_R DIS1 DIS2
+        将TimeStep从5>>1， 也就是没做出一次动作结果预测反传一次误差，这样有利于网络描述单个动作的反馈结果的准确性，而之前每五个动作后再次反传误差，不利于单个动作预测，而趋向于连续动作做出后的结果预测，这与正常的环境反馈是存在差异的，正常的环境反馈是在一个动作执行后得到的，而不是一连串动作后才有反馈，每个动作都有与之对应的环境反馈
+        将BatchSize从10>>500 增加一个Batch 中样本的覆盖范围，使模型在一个iteration内能够更好的提取环境的总体特征
+        完成了train_set, validation_set, test_set的制作
+        train_set:通过训练和误差传递，修正网络参数(W, B),建立一个数据到标签的抽象关系——MODEL
+        validation_set:对学习出来的MODEL调整超级参数（网络隐藏层数， 网络单元数， 训练次数等）
+        test_set:验证MODEL的准确性
+
+ RNN_Net_19_03_01: Net_Structure(6 - 512 - 5)
+
+        Input :S_L S_M S_R DIS1 DIS2 ACT
+        Output :S_L S_M S_R DIS1 DIS2
+        将Batch_Start的选取从连续选取变成随机选取
+        train_set,val_set,test_set 分开三次采集数据
+
+ RNN_Net_19_03_02: Net_Structure(6 - 512 - 3)
+
+        Input :S_L S_M S_R DIS1 DIS2 ACT
+        Output :S_L S_M S_R
+        在网络的输入层加入了relu激活函数，发现效果明显改善，relu对于0 1 的二分类预测非常有效
+        将红外传感器的0 1数据与距离传感器的距离数据分开训练，隔绝距离大误差对传感器小误差的干扰
+        通过Val_loss 和 train_loss曲线的对比可以发现，512个RNN cell units 存在过拟合现象
+        消除过拟合方法：
+                1：在训练数据中加入噪声（高斯， 正态分布。。）
+                2：减少RNN cell units（通过交叉验证曲线逐步找到最佳cell units）
+
+ RNN_Net_19_03_03: Net_Structure(3 - 512 - 2)
+        
+        Input :DIS1 DIS2 ACT
+        Output :DIS1 DIS2
+        距离的预测还是存在较大误差，已经将relu去掉，直接用全连接层左输入
+        提高了学习率0.006>>0.1
+        距离数据的交叉验证同样存在过拟合问题，验证集loss很高
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
