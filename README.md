@@ -108,8 +108,9 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
 
+ RNN_Net_19_03_01: Net_Structure(6 - 512 - 5)
 
-
+        
 
 
 
