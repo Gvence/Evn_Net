@@ -108,7 +108,12 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
 
- RNN_Net_19_03_01: Net_Structure(6 - 512 - 5)
+ RNN_Net_19_03_13: rnn_env_dis.py(3 - 64 - 2)
+		   rnn_env_sensor.py(6 - 64 - 3)
+
+        mixed_processing,成功将距离数据和sensor数据模型混合调用
+        考虑将Env和reforceLearning结合
+        经验发现64个cell比128个cell的RNN更好收敛，而且预测效果很好，可以继续调至32cell试试
 
         
 
