@@ -115,10 +115,14 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         考虑将Env和reforceLearning结合
         经验发现64个cell比128个cell的RNN更好收敛，而且预测效果很好，可以继续调至32cell试试
 
-        
 
+						  6 - 64 - 3
+ RNN_Net_19_03_14: mixed_train_processing.py (6 -            - 5)
+						  3 - 64 - 2	
 
-
+        mixed_train_processing.py成功将网络变成Dis 和Sensor 分流训练
+        创建了双RNN核，用于两个数据流的训练
+        需要等待训练结果，如果非常好就开始结合强化学习
 
 
 
