@@ -12,9 +12,9 @@ def get_batch(trainData):
     BATCH_START = random.randint(0, len(trainData) - 1 - 2 * TIME_STEPS * BATCH_SIZE)
     xs = trainData[BATCH_START:BATCH_START + TIME_STEPS*BATCH_SIZE,  :].reshape((-1,TIME_STEPS ,INPUT_SIZE))
     ys = trainData[BATCH_START + 1:BATCH_START + TIME_STEPS*BATCH_SIZE + 1, :-1].reshape((-1,TIME_STEPS,OUTPUT_SIZE))
-    if BATCH_START == (int(len(trainData)/BATCH_SIZE) - 2) * BATCH_SIZE:
-        INITSTATE = True
-        BATCH_START = 0
+    #if BATCH_START == (int(len(trainData)/BATCH_SIZE) - 2) * BATCH_SIZE:
+     #   INITSTATE = True
+      #  BATCH_START = 0
     return [xs, ys, xs]
 
 # 定义 LSTMRNN 的主体结构
@@ -35,7 +35,6 @@ class LSTMRNN_D(object):
         with tf.name_scope('inputs'):
             self.xs = tf.placeholder(tf.float32, [None, n_steps, input_size], name='xs')
             self.ys = tf.placeholder(tf.float32, [None, n_steps, output_size], name='ys')
-            # print(self.ys[:,:, 3:5])
         with tf.variable_scope('in_hidden'):
             self.add_input_layer()
         with tf.variable_scope('LSTM_cell'):
@@ -108,7 +107,7 @@ class LSTMRNN_D(object):
         #normalize
         if self.norm    :
             with tf.name_scope('normalize'):
-                self.D_l_in_y = self.normalize(self.D_l_in_y, 0, self.cell_size)
+                #self.D_l_in_y = self.normalize(self.D_l_in_y, 0, self.cell_size)
                 self.S_l_in_y = self.normalize(self.S_l_in_y, 0, self.cell_size)
 
     # 设置 add_cell 功能, 添加 cell, 注意这里的 self.cell_init_state,
@@ -121,8 +120,8 @@ class LSTMRNN_D(object):
 
             self.D_cell_outputs, self.D_cell_final_state = tf.nn.dynamic_rnn(
                 D_lstm_cell, self.D_l_in_y, initial_state=self.D_cell_init_state, time_major=False, )
-            if self.norm :
-                self.D_cell_outputs = self.normalize(self.D_cell_outputs, 0, self.cell_size)
+            #if self.norm :
+                #self.D_cell_outputs = self.normalize(self.D_cell_outputs, 0, self.cell_size)
             tf.summary.histogram('rnn_out', self.D_cell_outputs)
 
         with tf.name_scope('S_RNN_cell'):
@@ -172,7 +171,6 @@ class LSTMRNN_D(object):
 
         D_losses = tf.contrib.legacy_seq2seq.sequence_loss_by_example(
             [tf.reshape(self.pred_D, [-1], name='reshape_pred_D')],
-
             [tf.reshape(self.ys[:,:, 3:5], [-1], name='reshape_target_D')],
             [tf.ones([self.batch_size * self.n_steps * self.D_output_size], dtype=tf.float32)],
             average_across_timesteps=True,
@@ -217,7 +215,7 @@ class LSTMRNN_D(object):
         return tf.get_variable(name=name, shape=shape, initializer=initializer)
 
 def get_VTData(data):
-    batch_start = random.randint(0, len(data) - 1 - TIME_STEPS*BATCH_SIZE)
+    batch_start = random.randint(0, len(data) - 1 - 2 * TIME_STEPS*BATCH_SIZE)
     VTxin = data[batch_start:batch_start + TIME_STEPS*BATCH_SIZE , :].reshape((-1,TIME_STEPS ,INPUT_SIZE))
     VTlabel = data[batch_start + 1: batch_start + TIME_STEPS*BATCH_SIZE + 1, :-1].reshape((-1,TIME_STEPS,OUTPUT_SIZE))
     return [VTxin, VTlabel]
@@ -234,10 +232,10 @@ if __name__ == '__main__':
     S_INPUT_SIZE = 6 # 数据输入size
     S_OUTPUT_SIZE = 3  # 数据输出 size
     CELL_SIZE = 64 # RNN的 hidden unit size
-    LR = 0.005  # learning rate
+    LR = 0.006  # learning rate
     INITSTATE = False  # 判断是否读到数据的末尾，通过置零BATCHB_START开启第二轮训练
     MODEL_NAME = 'MIXED_MODEL'
-    MODEL_ITERATION = '10000'
+    MODEL_ITERATION = '680000'
     # 加载数据
     buildData = dataRebuild('Data.txt', 0.7, 0.15)
     trainData = np.loadtxt('trainData.txt')
@@ -245,7 +243,7 @@ if __name__ == '__main__':
     valData = np.loadtxt('valData.txt')
     # 搭建 LSTMRNN 模型
     model = LSTMRNN_D(TIME_STEPS, INPUT_SIZE, OUTPUT_SIZE, D_INPUT_SIZE, D_OUTPUT_SIZE, S_INPUT_SIZE,   S_OUTPUT_SIZE,
-                      CELL_SIZE, BATCH_SIZE, LR, norm = False)
+                      CELL_SIZE, BATCH_SIZE, LR, norm = True)
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.7)
     sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
     merged = tf.summary.merge_all()
@@ -265,9 +263,9 @@ if __name__ == '__main__':
     # matplotlib可视化
     plt.ion()  # 设置连续 plot
     plt.show()
-    D_fig = plt.figure(1, figsize=(10,12), dpi=80)
-    S_fig = plt.figure(2, figsize=(10,12), dpi=80)
-    iteration = 0
+    fig = plt.figure(1, figsize=(24,12), dpi=80)
+
+    iteration = 680000
     D_cost_list = []
     S_cost_list = []
     D_trainLoss_list = []
@@ -288,7 +286,7 @@ if __name__ == '__main__':
     while(True):
         iteration += 1
         seq, res, xs = get_batch(trainData)  # 提取 batch data
-        if iteration == 1 or INITSTATE:
+        if iteration == 680001:
             INITSTATE = False
             # 初始化 data
             feed_dict = {
@@ -311,26 +309,26 @@ if __name__ == '__main__':
 
         # 每50次迭代记录一次log 并print cost
         if iteration%50 == 0 :
-            D_cost_list.append(D_cost)
+            D_cost_list.append(D_cost)#用于单独显示的误差列表
             S_cost_list.append(S_cost)
-            D_label_list.append(res.reshape(-1, OUTPUT_SIZE)[-1, 3:5])
+            D_label_list.append(res.reshape(-1, OUTPUT_SIZE)[-1, 3:])
             S_label_list.append(res.reshape(-1, OUTPUT_SIZE)[-1, :3])
-            D_pred_list.append(D_pred.reshape(-1, OUTPUT_SIZE)[-1, :])
-            S_pred_list.append(S_pred.reshape(-1, OUTPUT_SIZE)[-1, :])
+            D_pred_list.append(D_pred.reshape(-1, D_OUTPUT_SIZE)[-1, :])
+            S_pred_list.append(S_pred.reshape(-1, S_OUTPUT_SIZE)[-1, :])
             if len(D_trainLoss_list) == 300:
                 D_valLoss_list = []
                 S_valLoss_list = []
-                DtrainLoss_list = []
-                StrainLoss_list = []
+                D_trainLoss_list = []
+                S_trainLoss_list = []
                 # testLoss_list = []
             VD = get_VTData(trainData)
             valxs = VD[0]
             valys = VD[1]
             D_valLoss, D_valpre, S_valLoss, S_valpre = sess.run([model.D_cost, model.pred_D, model.S_cost, model.pred_S], feed_dict={model.xs: valxs,model.ys: valys})
-            D_vallabel_list.append(valys.reshape(-1, OUTPUT_SIZE)[-1, 3:5])
+            D_vallabel_list.append(valys.reshape(-1, OUTPUT_SIZE)[-1, 3:])
             S_vallabel_list.append(valys.reshape(-1, OUTPUT_SIZE)[-1, :3])
-            D_valpred_list.append(D_valpre.reshape(-1, OUTPUT_SIZE)[-1, :])
-            S_valpred_list.append(S_valpre.reshape(-1, OUTPUT_SIZE)[-1, :])
+            D_valpred_list.append(D_valpre.reshape(-1, D_OUTPUT_SIZE)[-1, :])
+            S_valpred_list.append(S_valpre.reshape(-1, S_OUTPUT_SIZE)[-1, :])
             # cost保留四位小数输出
             print('iteration: ', iteration, 'D_train_cost: ', round(D_cost, 4), 'D_val_cost:', round(D_valLoss, 4),
                   'D_test_cost:', 'None\n',
@@ -341,14 +339,14 @@ if __name__ == '__main__':
             # testLoss_list.append(testLoss)
             D_valLoss_list.append(D_valLoss)
             S_valLoss_list.append(S_valLoss)
-            D_trainLoss_list.append(np.mean(D_cost_list))
-            S_trainLoss_list.append(np.mean(S_cost_list))
+            D_trainLoss_list.append(D_cost)#用于交叉验证的误差列表
+            S_trainLoss_list.append(S_cost)
             result = sess.run(merged, feed_dict)
             writer.add_summary(result, iteration)
 
 
         # 每1000次迭代保存一次模型 并打印cost曲线
-        if iteration % 2500 == 0:
+        if iteration % 5000 == 0:
             # # # 保存模型
             saver.save(sess, 'model/%s'%MODEL_NAME, global_step=iteration)
 
@@ -356,32 +354,43 @@ if __name__ == '__main__':
             S_label = np.array(S_label_list)
             S_output = np.array(S_pred_list)
             S_vallabel = np.array(S_vallabel_list)
-            S_valOutput = np.array(S_valpred_list)
+            S_valoutput = np.array(S_valpred_list)
             plt.clf()
-            S_chart_1 = S_fig.add_subplot(5, 1, 1, xlim=(0, S_label.shape[0]))
+            S_chart_1 = fig.add_subplot(8, 2, 1, xlim=(0, S_label.shape[0]))
             S_chart_1.set_title('S_L')
-            S_chart_2 = S_fig.add_subplot(5, 1, 2, xlim=(0, S_label.shape[0]))
+            S_chart_2 = fig.add_subplot(8, 2, 3, xlim=(0, S_label.shape[0]))
             S_chart_2.set_title('S_M')
-            S_chart_3 = S_fig.add_subplot(5, 1, 3, xlim=(0, S_label.shape[0]))
+            S_chart_3 = fig.add_subplot(8, 2, 5, xlim=(0, S_label.shape[0]))
             S_chart_3.set_title('S_R')
-            S_chart_4 = S_fig.add_subplot(5, 1, 4, xlim=(0, len(S_cost_list)))
-            S_chart_4.set_title('S_trainLoss')
-            S_chart_5 = S_fig.add_subplot(5, 1, 5, xlim=(0, len(S_trainLoss_list)))
-            S_chart_5.set_title('S_train_test_val_loss')
+            S_chart_4 = fig.add_subplot(8, 2, 7, xlim=(0, S_label.shape[0]))
+            S_chart_4.set_title('VAL_S_L')
+            S_chart_5 = fig.add_subplot(8, 2, 9, xlim=(0, S_label.shape[0]))
+            S_chart_5.set_title('VAL_S_M')
+            S_chart_6 = fig.add_subplot(8, 2, 11, xlim=(0, S_label.shape[0]))
+            S_chart_6.set_title('VAL_S_R')
+            S_chart_7 = fig.add_subplot(8, 2, 13, xlim=(0, len(S_cost_list)))
+            S_chart_7.set_title('S_trainLoss')
+            S_chart_8 = fig.add_subplot(8, 2, 15, xlim=(0, len(S_trainLoss_list)))
+            S_chart_8.set_title('S_train_test_val_loss')
 
 
             D_label = np.array(D_label_list)
             D_output = np.array(D_pred_list)
             D_vallabel = np.array(D_vallabel_list)
-            D_valOutput = np.array(D_valpred_list)
-            D_chart_1 = D_fig.add_subplot(4, 1, 1, xlim=(0, D_label.shape[0]))
+            D_valoutput = np.array(D_valpred_list)
+
+            D_chart_1 = fig.add_subplot(8, 2, 2, xlim=(0, D_label.shape[0]))
             D_chart_1.set_title('Dis_1')
-            D_chart_2 = D_fig.add_subplot(4, 1, 2, xlim=(0, D_label.shape[0]))
+            D_chart_2 = fig.add_subplot(8, 2, 4, xlim=(0, D_label.shape[0]))
             D_chart_2.set_title('Dis_2')
-            D_chart_3 = D_fig.add_subplot(4, 1, 3, xlim=(0, len(D_cost_list)))
-            D_chart_3.set_title('D_trainLoss')
-            D_chart_4 = D_fig.add_subplot(4, 1, 4, xlim=(0, len(D_trainLoss_list)))
-            D_chart_4.set_title('D_train_test_val_loss')
+            D_chart_3 = fig.add_subplot(8, 2, 6, xlim=(0, D_label.shape[0]))
+            D_chart_3.set_title('VALDis_1')
+            D_chart_4 = fig.add_subplot(8, 2, 8, xlim=(0, D_label.shape[0]))
+            D_chart_4.set_title('VALDis_2')
+            D_chart_5 = fig.add_subplot(8, 2, 10, xlim=(0, len(D_cost_list)))
+            D_chart_5.set_title('D_trainLoss')
+            D_chart_6 = fig.add_subplot(8, 2, 12, xlim=(0, len(D_trainLoss_list)))
+            D_chart_6.set_title('D_train_test_val_loss')
 
             # S_L
             S_chart_1.scatter(np.arange(0, S_label.shape[0]), S_label[:, 0], c='blue', s=10, marker='o')
@@ -392,12 +401,21 @@ if __name__ == '__main__':
             # S_R
             S_chart_3.scatter(np.arange(0, S_label.shape[0]), S_label[:, 2], c='blue', s=10, marker='o')
             S_chart_3.scatter(np.arange(0, S_output.shape[0]), S_output[:, 2], c='red', s=10, marker='x')
+            # VALS_L
+            S_chart_4.scatter(np.arange(0, S_vallabel.shape[0]), S_vallabel[:, 0], c='blue', s=10, marker='o')
+            S_chart_4.scatter(np.arange(0, S_valoutput.shape[0]), S_valoutput[:, 0], c='red', s=10, marker='x')
+            # VALS_M
+            S_chart_5.scatter(np.arange(0, S_vallabel.shape[0]), S_vallabel[:, 1], c='blue', s=10, marker='o')
+            S_chart_5.scatter(np.arange(0, S_valoutput.shape[0]), S_valoutput[:, 1], c='red', s=10, marker='x')
+            # VALS_R
+            S_chart_6.scatter(np.arange(0, S_vallabel.shape[0]), S_vallabel[:, 2], c='blue', s=10, marker='o')
+            S_chart_6.scatter(np.arange(0, S_valoutput.shape[0]), S_valoutput[:, 2], c='red', s=10, marker='x')
             # Cost
-            S_chart_4.plot(np.arange(0, len(S_cost_list)), S_cost_list, 'r-', lw=2)
+            S_chart_7.plot(np.arange(0, len(S_cost_list)), S_cost_list, 'r-', lw=2)
             # VT_cost
             # chart_7.plot (np.arange(0, len(testLoss_list)), testLoss_list, 'g-', lw = 2)
-            S_chart_5.plot(np.arange(0, len(S_valLoss_list)), S_valLoss_list, 'r--', lw=2)
-            S_chart_5.plot(np.arange(0, len(S_trainLoss_list)), S_trainLoss_list, 'b--', lw=2)
+            S_chart_8.plot(np.arange(0, len(S_valLoss_list)), S_valLoss_list, 'r--', lw=2)
+            S_chart_8.plot(np.arange(0, len(S_trainLoss_list)), S_trainLoss_list, 'b--', lw=2)
 
             # Dis_1
             D_chart_1.plot(np.arange(0, D_label.shape[0]), D_label[:, 0], 'b-', lw=4)
@@ -405,12 +423,18 @@ if __name__ == '__main__':
             # Dis_2
             D_chart_2.plot(np.arange(0, D_label.shape[0]), D_label[:, 1], 'b-', lw=4)
             D_chart_2.plot(np.arange(0, D_output.shape[0]), D_output[:, 1], 'r--', lw=2)
+            # VALDis_1
+            D_chart_3.plot(np.arange(0, D_vallabel.shape[0]), D_vallabel[:, 0], 'b-', lw=4)
+            D_chart_3.plot(np.arange(0, D_valoutput.shape[0]), D_valoutput[:, 0], 'r--', lw=2)
+            # VALDis_2
+            D_chart_4.plot(np.arange(0, D_vallabel.shape[0]), D_vallabel[:, 1], 'b-', lw=4)
+            D_chart_4.plot(np.arange(0, D_valoutput.shape[0]), D_valoutput[:, 1], 'r--', lw=2)
             # Cost
-            D_chart_3.plot(np.arange(0, len(D_cost_list)), D_cost_list, 'r-', lw=2)
+            D_chart_5.plot(np.arange(0, len(D_cost_list)), D_cost_list, 'r-', lw=2)
             # VT_cost
             # chart_7.plot (np.arange(0, len(testLoss_list)), testLoss_list, 'g-', lw = 2)
-            D_chart_4.plot(np.arange(0, len(D_valLoss_list)), D_valLoss_list, 'r--', lw=2)
-            D_chart_4.plot(np.arange(0, len(D_trainLoss_list)), D_trainLoss_list, 'b--', lw=2)
+            D_chart_6.plot(np.arange(0, len(D_valLoss_list)), D_valLoss_list, 'r--', lw=2)
+            D_chart_6.plot(np.arange(0, len(D_trainLoss_list)), D_trainLoss_list, 'b--', lw=2)
             plt.pause(0.1)
             if not os.path.exists('plot'):
                 os.makedirs('plot')
