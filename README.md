@@ -114,15 +114,39 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         mixed_processing,成功将距离数据和sensor数据模型混合调用
         考虑将Env和reforceLearning结合
         经验发现64个cell比128个cell的RNN更好收敛，而且预测效果很好，可以继续调至32cell试试
+        模型调用很慢
 
 
-						  6 - 64 - 3
+						                          6 - 64 - 3
  RNN_Net_19_03_14: mixed_train_processing.py (6 -            - 5)
-						  3 - 64 - 2	
+						                          3 - 64 - 2	
 
         mixed_train_processing.py成功将网络变成Dis 和Sensor 分流训练
         创建了双RNN核，用于两个数据流的训练
         需要等待训练结果，如果非常好就开始结合强化学习
+
+						                          6 - 32 - 3
+ RNN_Net_19_03_25: mixed_train_processing.py (6 -            - 5)
+						                          3 - 32 - 2	
+
+        随机选取BATCH_START,然后进行连续性训练
+        每次都对时间片段的下一个状态进行预测，然后将时间片段向前推进一个时间点
+        存在疑惑：
+            所有的BATCH的时间都是连续的，虽然根据BATCH_SIZE选取了多个时间片段
+            但是这些时间片段都是连载一起的，训练效果存在质疑
+            打算根据BATCH_SIZE随机选取多个时间片段，再进行时间点延伸训练
+
+
+						                          6 - 32 - 3
+ RNN_Net_19_04_02: mixed_train_processing.py (6 -            - 5)
+						                          3 - 32 - 2	
+        编写了一套新的数据获取和训练框架
+        首先随机选取BATCH_SIZE个BATCH_START（时间片段起始点）
+        每次训练结束，所有的BATCH的时间点加一（即向前延伸一个时间点）
+        当延伸STEP_LENGTH个时间点后，一个训练回合结束（iteration+1）
+        当训练的数据量大致等于数据的总量时即完成一个训练周期（EPO + 1）
+        适当的增加BATCH_SIZE可以提升训练效率，加快网络的收敛
+        多个BATCH_SIZE作为一个tensor输入网络可以使网络更好把握收敛方向，提高效率和成功率
 
 
 
