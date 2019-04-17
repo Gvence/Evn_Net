@@ -1,11 +1,12 @@
 # Evn_Net
-NN_Net_19_12_26: Net_Structure(5 - 10 - 20 - 20 - 10 - 5 )
+# NN_Net_19_12_26: Net_Structure(5 - 10 - 20 - 20 - 10 - 5 )
 
         Input:S_L S_M S_R Dis Act
         Output:S_L S_M S_R Dis Rew
         Need Data normalization loss Error, no GradientDescent
         Result like log 2019_01_03_20_06_06_NN_Netlog
-NN_Net_19_1_04: Net_Structure(5 - 20 - 100 - 20 -5)
+
+# NN_Net_19_1_04: Net_Structure(5 - 20 - 100 - 20 -5)
 
         Input: S_L S_M S_R Dis Act
         Output: S_L S_M S_R Dis 
@@ -13,18 +14,18 @@ NN_Net_19_1_04: Net_Structure(5 - 20 - 100 - 20 -5)
         6000 samples every times
         some sensor result will be ignored because its sample size is very small
 
-Car_Remote_Control_19_1_11:
+# Car_Remote_Control_19_1_11:
         
         Pi_Car remote control code
         U can use this code to control the pi_Car with terminal in pi
         U should connect with pi through VNCViewer first
 
-SensorDataRecord_19_1_11:
+# SensorDataRecord_19_1_11:
         
         Sensor Result of remote control car
         Sensor data include: S_L S_M S_R DIS1 DIS2 ACT
  
-NN_Net_19_1_11: Net_Structure(6 - 20 - 50 - 20 - 5 )
+# NN_Net_19_1_11: Net_Structure(6 - 20 - 50 - 20 - 5 )
         
         Trainning code of sensor data
         Input the whole sensor data every episode:S_L S_M S_R DIS1 DIS2 ACT
@@ -32,7 +33,7 @@ NN_Net_19_1_11: Net_Structure(6 - 20 - 50 - 20 - 5 )
         Env is a statics state, but in this method of trainning it think of the enviroment
                 as some linear states
                 
-RNN_Net_19_2_26: Net_Structure(6 - 512 - 5 )
+# RNN_Net_19_2_26: Net_Structure(6 - 512 - 5 )
 
         record_ata.txt from map.py 
         Input :S_L S_M S_R DIS1 DIS2 ACT
@@ -43,7 +44,7 @@ RNN_Net_19_2_26: Net_Structure(6 - 512 - 5 )
         数据量十分庞大需要数据预处理，制作训练集，测试级，验证集用于后期网络性能验证（参考图像数据集制作）
         需要增加网络模型保存方法
 
-RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
+# RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 	
         Input :S_L S_M S_R DIS1 DIS2 ACT
         Output :S_L S_M S_R DIS1 DIS2
@@ -53,7 +54,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         需要增加交叉验证方法
         了解网络中交叉熵加softmax的loss定义方法
 
- RNN_Net_19_2_28: Net_Structure(6 - 512 - 5)
+# RNN_Net_19_2_28: Net_Structure(6 - 512 - 5)
 
         Input :S_L S_M S_R DIS1 DIS2 ACT
         Output :S_L S_M S_R DIS1 DIS2
@@ -64,14 +65,14 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         validation_set:对学习出来的MODEL调整超级参数（网络隐藏层数， 网络单元数， 训练次数等）
         test_set:验证MODEL的准确性
 
- RNN_Net_19_03_01: Net_Structure(6 - 512 - 5)
+# RNN_Net_19_03_01: Net_Structure(6 - 512 - 5)
 
         Input :S_L S_M S_R DIS1 DIS2 ACT
         Output :S_L S_M S_R DIS1 DIS2
         将Batch_Start的选取从连续选取变成随机选取
         train_set,val_set,test_set 分开三次采集数据
 
- RNN_Net_19_03_02: Net_Structure(6 - 512 - 3)
+# RNN_Net_19_03_02: Net_Structure(6 - 512 - 3)
 
         Input :S_L S_M S_R DIS1 DIS2 ACT
         Output :S_L S_M S_R
@@ -82,7 +83,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
                 1：在训练数据中加入噪声（高斯， 正态分布。。）
                 2：减少RNN cell units（通过交叉验证曲线逐步找到最佳cell units）
 
- RNN_Net_19_03_03: Net_Structure(3 - 512 - 2)
+# RNN_Net_19_03_03: Net_Structure(3 - 512 - 2)
         
         Input :DIS1 DIS2 ACT
         Output :DIS1 DIS2
@@ -94,7 +95,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
  
- RNN_Net_19_03_03: rnn_env_dis.py(3 - 64 - 2)
+# RNN_Net_19_03_03: rnn_env_dis.py(3 - 64 - 2)
 		   rnn_env_sensor.py(6 - 64 - 3)
 	
 
@@ -108,7 +109,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
 
- RNN_Net_19_03_13: rnn_env_dis.py(3 - 64 - 2)
+# RNN_Net_19_03_13: rnn_env_dis.py(3 - 64 - 2)
 		   rnn_env_sensor.py(6 - 64 - 3)
 
         mixed_processing,成功将距离数据和sensor数据模型混合调用
@@ -118,7 +119,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
 						                          6 - 64 - 3
- RNN_Net_19_03_14: mixed_train_processing.py (6 -            - 5)
+# RNN_Net_19_03_14: mixed_train_processing.py (6 -            - 5)
 						                          3 - 64 - 2	
 
         mixed_train_processing.py成功将网络变成Dis 和Sensor 分流训练
@@ -126,7 +127,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
         需要等待训练结果，如果非常好就开始结合强化学习
 
 						                          6 - 32 - 3
- RNN_Net_19_03_25: mixed_train_processing.py (6 -            - 5)
+# RNN_Net_19_03_25: mixed_train_processing.py (6 -            - 5)
 						                          3 - 32 - 2	
 
         随机选取BATCH_START,然后进行连续性训练
@@ -138,7 +139,7 @@ RNN_Net_19_2_27: Net_Structure(6 - 512 - 5)
 
 
 						                          6 - 32 - 3
- RNN_Net_19_04_02: mixed_train_processing.py (6 -            - 5)
+# RNN_Net_19_04_02: mixed_train_processing.py (6 -            - 5)
 						                          3 - 32 - 2	
         编写了一套新的数据获取和训练框架
         首先随机选取BATCH_SIZE个BATCH_START（时间片段起始点）
